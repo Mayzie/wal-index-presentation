@@ -9,6 +9,7 @@
 
 \usetheme{Berlin}
 \usecolortheme{beaver}
+\beamertemplatenavigationsymbolsempty
 
 %Gummi|065|=)
 \title[Bitmap Indexes for Large Datasets]{\textbf{Using Bitmap Index for Interactive Exploration of Large Datasets}}
@@ -32,18 +33,120 @@
 
 \section{Introduction}
 
-\subsection[Subsection]{Bitmap Indexes}
+\subsection[Bitmap Indexes]{Bitmap Indexes}
 
 \begin{frame}
-	\frametitle{What Are Bitmap Indexes?}
+	\frametitle{Bitmap Indexes}
 	
-	Bitmap Indexes are:
+	Bitmap Indexes:
 	\begin{itemize}
 		\pause
-		\item Herp
+		\item Are an old idea
 		\pause
-		\item Derp
+		\item Are efficient for big data and data warehouse solutions with read-only records
+		\pause
+		\item Do not reorder data, unlike some other algorithms
 	\end{itemize}
+\end{frame}
+
+\subsubsection[Bitmap Indexes]{What Are They?}
+\begin{frame}
+	\frametitle{What Are They?}
+	
+	For those who weren't in last week's lecture, they \pause are a way to represent records and fields as a grid (essentially).
+	
+	\pause
+	\begin{exampleblock}{Just imagine...}
+		Imagine a table, with a bunch of records ($R_x$) and an enumeration ($A_x = \{1, 2, 3\}$):
+		
+		\pause
+		\begin{tabular}{r|c|c|c|c}
+				& \textbf{Value} & $A_1$ & $A_2$ & $A_3$ \\ \hline
+			$R_1$ & $3$	& 	& 	& \\
+			$R_2$ & $1$	& 	& 	& \\
+			$R_3$ & $1$	& 	& 	& \\
+			$R_4$ & $2$	& 	& 	& \\
+			$R_5$ & $3$	& 	& 	& 
+		\end{tabular}
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+	\frametitle{What Are They?}
+	
+	For those who weren't in last week's lecture, they are a way to represent records and fields as a grid (essentially).
+	
+	\begin{exampleblock}{Just imagine...}
+		Imagine a table, with a bunch of records ($R_x$) and an enumeration ($A_x = \{1, 2, 3\}$):
+		
+		\begin{tabular}{r|c|c|c|c}
+				& \textbf{Value} & $A_1$ & $A_2$ & $A_3$ \\ \hline
+			$R_1$ & $3$	& $0$	& $0$	& $1$ \\
+			$R_2$ & $1$	& $1$	& $0$	& $0$ \\
+			$R_3$ & $1$	& $1$	& $0$	& $0$ \\
+			$R_4$ & $2$	& $0$	& $1$	& $0$ \\
+			$R_5$ & $3$	& $0$	& $0$	& $1$ 
+		\end{tabular}
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+	\frametitle{What Are They?}
+	
+	The example table mentioned before can become really really big with multiple attributes and multiple rows.
+	\pause
+	\begin{exampleblock}{Lot's of attributes!}
+		It could look something like this:
+		
+		\begin{columns}[c]
+			\column{.4\textwidth}
+			\begin{tabular}{r|c|c|c|c}
+					& \textbf{Value} & $A_1$ & $A_2$ & $A_3$ \\ \hline
+				$R_1$ & $3$	& $0$	& $0$	& $1$ \\
+				$R_2$ & $1$	& $1$	& $0$	& $0$ \\
+				$R_3$ & $1$	& $1$	& $0$	& $0$ \\
+				$R_4$ & $2$	& $0$	& $1$	& $0$ \\
+				$R_5$ & $3$	& $0$	& $0$	& $1$ 
+			\end{tabular}
+			\column{.4\textwidth}
+			\begin{tabular}{r|c|c|c|c}
+					& \textbf{Value} & $B_1$ & $B_2$ & $B_3$ \\ \hline
+				$R_1$ & $1$	& $1$	& $0$	& $0$ \\
+				$R_2$ & $1$	& $1$	& $0$	& $0$ \\
+				$R_3$ & $3$	& $0$	& $0$	& $1$ \\
+				$R_4$ & $2$	& $0$	& $1$	& $0$ \\
+				$R_5$ & $3$	& $0$	& $0$	& $1$ 
+			\end{tabular}
+		\end{columns}	
+	\end{exampleblock}
+	
+	\pause
+	How to determine if a record matches multiple attributes? Use a bitwise-AND!
+	
+	\pause
+	This is quite a quick and efficient operation.
+\end{frame}
+
+\subsection[Bitmap Compression]{Bitmap Compression}
+\begin{frame}
+	\frametitle{Bitmap Compression}
+	
+	Bitmap Indexes are great, efficient, and all. But, they can become very large!
+	\pause
+	The researchers of this paper had two data samples:
+	\begin{itemize}
+		\pause
+		\item $1.6$ GiB
+		\pause
+		\item $30$ GiB
+	\end{itemize}
+	
+	\pause
+	Storing these in a typical database with a \texttt{Bitmap Index} took $3\times$ the size, similar to when using a \texttt{B-Tree Index} \pause $=$ Not ideal!
+\end{frame}
+
+\begin{frame}
+	\frametitle{Bitmap Compression}
 \end{frame}
 
 \end{document}
