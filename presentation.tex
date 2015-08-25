@@ -97,7 +97,7 @@
 	
 	The example table mentioned before can become really really big with multiple attributes and multiple rows.
 	\pause
-	\begin{exampleblock}{Lot's of attributes!}
+	\begin{exampleblock}{Lots of attributes!}
 		It could look something like this:
 		
 		\begin{columns}[c]
@@ -140,7 +140,7 @@
 		\pause
 		\item $1.6$ GiB
 		\pause
-		\item $30$ GiB
+		\item $33$ GiB
 	\end{itemize}
 	
 	\pause
@@ -298,9 +298,131 @@
 
 % End of Daniel's Part
 
-\section[Region Growing]{Region Growing}
+\section[Feature Tracking]{Feature Tracking}
+\begin{frame}
+	\frametitle{Feature Tracking}
+	
+	Given some kinds of data we want to identify and track regions of interest.
 
-\section[Region Tracking]{Region Tracking}
+	\pause
+	\begin{itemize}
+		\item Numerical simulations of scalar or vector fields on some domain.
+		\begin{itemize}
+			\item E.g. The temperature and velocity in a volume of air.
+		\end{itemize}
+
+		\pause
+		\item Stored as a collection of snapshots of a 3D grid over time.
+
+		\pause
+		\item Regions of interest are regions that satisfy certain properties
+		\begin{itemize}
+			\item E.g. High temperature regions in a combustion simulation.
+		\end{itemize}
+	\end{itemize}
+
+	\pause
+	To visualise this data we need the boundaries of connected regions, and how they change in time.
+\end{frame}
+
+
+\subsection[Region Growing]{Region Growing}
+\begin{frame}
+	\frametitle{Region Growing}
+
+	After using bitmap indexes to find the points satisfying the conditions we need to identify the connected regions.
+
+	\pause
+	\begin{columns}[c]
+		\column{.5\textwidth}
+		\includegraphics[height=5cm]{example_grid.png}
+		\column{.5\textwidth}
+		
+		\begin{itemize}
+			\item Compressed bitmap converted into a list of line segments
+			\pause
+			\item Line segments are aligned along the x-axis
+			\pause
+			\item Discovers line segments in order of j and k
+		\end{itemize}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Region Growing}
+
+	Once we have the line segments, we assign them to connected regions.
+	\pause
+	\begin{columns}[c]
+		\column{.5\textwidth}
+		\includegraphics[height=5cm]{example_grid.png}
+		\column{.5\textwidth}
+		
+		\begin{itemize}
+			\item For each line segment with coordinates (j, k) we compare with all line segments with coordinates (j-1, k), (j, k-1), and maybe (j-1, k-1)
+			\pause
+			\item If the line segments overlap then they are connected
+		\end{itemize}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Region Growing}
+
+	To generate a smooth boundary we calculate the positions of the exposed points and their outside neighbours and interpolate.
+	\pause
+	\begin{itemize}
+		\item Most steps in region growing take $O(s)$ time. $s$ is the size of the boundary.
+		\pause
+		\item Some take $O(s_l)$ time. $s_l$ is the number of line segments.
+		\pause
+		\item Overall takes $O(s)$ time.
+		\begin{itemize}
+			\item vs $O(v)$ time for a straightforward algorithm.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\subsection[Region Tracking]{Region Tracking}
+\begin{frame}
+	\frametitle{Region Tracking}
+
+	With spatio-temporal datasets we want to be able to track the evolution of regions of interest over time.
+
+	\pause
+	\begin{itemize}
+		\item We produce bitmaps for each connected region identified during region growing.
+		\pause
+		\item These bitmaps are used to determine the overlap of regions in neighbouring time steps.
+		\pause
+		\item Can do a bitwise AND operation and count the number of 1s.
+		\pause
+		\item Has a time and space complexity of $O(s_1 + s_2)$ which is optimal.
+		\begin{itemize}
+			\item Compared to $O(v_1 v_2)$ for a straightforward approach.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Region Tracking}
+
+	A simple approach assigns numbers to regions which identifies them over time.
+	\begin{columns}[c]
+		\column{.5\textwidth}
+		\includegraphics[height=5cm]{regions.png}
+		\column{.5\textwidth}
+		\pause
+		\begin{itemize}
+			\item At the first time step, regions are arbitrarily numbered.
+			\pause
+			\item A region in time step $p$ gets assigned the number of the region in time step $p-1$ with maximal overlap
+			\begin{itemize}
+				\item or an arbitrary number if it does not overlap.
+			\end{itemize}
+		\end{itemize}
+	\end{columns}
+\end{frame}
 
 \section[Finish]{Finish}
 
